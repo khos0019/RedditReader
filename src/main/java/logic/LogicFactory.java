@@ -30,8 +30,6 @@ public abstract class LogicFactory<T> {
             return getFor((Class<T>) genericClass);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch(IllegalArgumentException ex){
-            ex.printStackTrace();
         }
         return null;
     }
