@@ -5,25 +5,15 @@
  */
 package view;
 
-import common.FileUtility;
-import entity.Account;
-import entity.Image;
-import logic.AccountLogic;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.nio.file.Files;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import logic.AccountLogic;
-import logic.ImageLogic;
-import logic.BoardLogic;
-import logic.HostLogic;
-import logic.LogicFactory;
+
 
 /**
  *
@@ -60,7 +50,18 @@ public class ImageDelivery extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         log("GET");
-        doPost(req, resp);
+        
+        String imageDirectory = System.getProperty("user.home");
+        String fileName = req.getPathInfo();
+        
+        File file = new File(imageDirectory + "/My Documents/Reddit Images", fileName);
+        
+        resp.setHeader("Content-Type", getServletContext().getMimeType(fileName));
+        resp.setHeader("Content-Length", String.valueOf(file.length()));
+        resp.setHeader("Content-Disposition", "inline; filename=\"" + fileName + "\"");
+        
+       Files.copy(file.toPath(), resp.getOutputStream());
+          
     }
     
     /**
@@ -75,7 +76,8 @@ public class ImageDelivery extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        log("POST");   
+        log("POST"); 
+        processRequest(req, resp);
     }
     
     /**
