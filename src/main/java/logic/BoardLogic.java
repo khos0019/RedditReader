@@ -109,15 +109,15 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
     }
 
     public List<String> getColumnNames() {
-        return Arrays.asList("ID", "Url", "Name", "Hostid");
+        return Arrays.asList("ID", "Hostid", "Url", "Name");
     }
 
     public List<String> getColumnCodes() {
-        return Arrays.asList(ID, URL, NAME, HOST_ID);
+        return Arrays.asList(ID, HOST_ID, URL, NAME);
     }
 
     public List<?> extractDataAsList(Board e) {
-        return Arrays.asList(e.getId(), e.getUrl(), e.getName(), e.getHostid());
+        return Arrays.asList(e.getId(), e.getHostid(), e.getUrl(), e.getName());
     }
 
 }

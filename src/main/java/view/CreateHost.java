@@ -22,7 +22,7 @@ import logic.LogicFactory;
  *
  * @author Khosla
  */
-@WebServlet(name = "CreateBoard", urlPatterns = {"/CreateBoard"})
+@WebServlet(name = "CreateHost", urlPatterns = {"/CreateHost"})
 public class CreateHost extends HttpServlet {
     
     private String errorMessage = null;
