@@ -17,7 +17,7 @@ import common.ValidationException;
 
 /**
  *
- * @author Khosla
+ * @author Navraj Khosla
  */
 public class BoardLogic extends GenericLogic<Board, BoardDAL> {
 
@@ -30,10 +30,12 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
         super(new BoardDAL());
     }
 
+    @Override
     public List<Board> getAll() {
         return get(() -> dal().findAll());
     }
 
+    @Override
     public Board getWithId(int id) {
         return get(() -> dal().findById(id));
     }
@@ -50,7 +52,9 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
         return get(() -> dal().findByName(name));
     }
 
+    @Override
     public Board createEntity(Map<String, String[]> parameterMap) {
+
         Objects.requireNonNull(parameterMap, "parameterMap cannot be null");
         //same as if condition below
         //        if (parameterMap == null) {
@@ -71,6 +75,9 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
             }
         }
 
+        //Host ID is genereated, so if it exists add it to the entity object
+        //otherwise it does not matter as mysql will create an if for it.
+        //the only time that we will have host id is for update behaviour.
         if (parameterMap.containsKey(HOST_ID)) {
             try {
                 Host host = new Host(Integer.parseInt(parameterMap.get(HOST_ID)[0]));
@@ -80,20 +87,14 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
             }
         }
 
-        //before using the values in the map, make sure to do error checking.
-        //simple lambda to validate a string, this can also be place in another
-        //method to be shared amoung all logic classes.
+        //Method does error checking for us.
+        //Simple lambda to validate that the string has the appropriate value and length.
         ObjIntConsumer< String> validator = (value, length) -> {
             if (value == null || value.trim().isEmpty() || value.length() > length) {
                 throw new ValidationException("value cannot be null, empty or larger than " + length + " characters");
             }
         };
 
-        //extract the date from map first.
-        //everything in the parameterMap is string so it must first be
-        //converted to appropriate type. have in mind that values are
-        //stored in an array of String; almost always the value is at
-        //index zero unless you have used duplicated key/name somewhere.
         String url = parameterMap.get(URL)[0];
         String name = parameterMap.get(NAME)[0];
 
@@ -107,15 +108,37 @@ public class BoardLogic extends GenericLogic<Board, BoardDAL> {
 
         return entity;
     }
-
+    
+    /**
+     * this method is used to send a list of all names to be used form table
+     * column headers.
+     *
+     * @return list of all column names to be displayed.
+     */
+    @Override
     public List<String> getColumnNames() {
         return Arrays.asList("ID", "Hostid", "Url", "Name");
     }
 
+    /**
+     * this method returns a list of column names that match the official column
+     * names in the db. 
+     *
+     * @return list of all column names in DB.
+     */
+    @Override
     public List<String> getColumnCodes() {
         return Arrays.asList(ID, HOST_ID, URL, NAME);
     }
-
+    
+    /**
+     * return the list of values of all columns (variables) in given entity.
+     *
+     * @param e - given Entity to extract data from.
+     *
+     * @return list of extracted values
+     */
+    @Override
     public List<?> extractDataAsList(Board e) {
         return Arrays.asList(e.getId(), e.getHostid(), e.getUrl(), e.getName());
     }

@@ -21,14 +21,11 @@ import logic.LogicFactory;
 
 /**
  *
- * @author Khosla
+ * @author Navraj Khosla
  */
 @WebServlet(name = "HostTable", urlPatterns = {"/HostTable"})
 public class HostTableView extends HttpServlet {
-    
-    HostLogic logic = LogicFactory.getFor("Host");
-    List<Host> entities = logic.getAll();
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -51,28 +48,32 @@ public class HostTableView extends HttpServlet {
 
             out.println("<table style=\"margin-left: auto; margin-right: auto;\" border=\"1\">");
             out.println("<caption>Host</caption>");
-            //this is an example, for your other tables use getColumnNames from
-            //logic to create headers in a loop.
-            
+
+            HostLogic logic = LogicFactory.getFor("Host");
+            List<Host> entities = logic.getAll();
+
             out.println("<tr>");
-            for(Object str : logic.getColumnNames().toArray()){
-                out.printf("<td>%s</td>",str);
+
+            //logic to create headers
+            for (Object obj : logic.getColumnNames().toArray()) {
+                out.printf("<td>%s</td>", obj);
             }
+
             out.println("</tr>");
 
+            //logic to fill/extract data
             for (Host e : entities) {
-                //for other tables replace the code bellow with
-                //extractDataAsList in a loop to fill the data.
                 out.printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
                         logic.extractDataAsList(e).toArray());
             }
 
             out.println("<tr>");
-            //this is an example, for your other tables use getColumnNames from
-            //logic to create headers in a loop.
-            for(Object str : logic.getColumnNames().toArray()){
-                out.printf("<td>%s</td>",str);
+
+            //logic to create headers
+            for (Object str : logic.getColumnNames().toArray()) {
+                out.printf("<td>%s</td>", str);
             }
+
             out.println("</tr>");
             out.println("</table>");
             out.printf("<div style=\"text-align: center;\"><pre>%s</pre></div>", toStringMap(request.getParameterMap()));
@@ -145,5 +146,5 @@ public class HostTableView extends HttpServlet {
         String message = String.format("[%s] %s", getClass().getSimpleName(), msg);
         getServletContext().log(message, t);
     }
-    
+
 }

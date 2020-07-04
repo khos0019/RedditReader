@@ -17,61 +17,64 @@ import java.util.function.ObjIntConsumer;
 import common.ValidationException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 /**
  *
- * @author Khosla
+ * @author Navraj Khosla
  */
 public class ImageLogic extends GenericLogic<Image, ImageDAL> {
-    
-    public static SimpleDateFormat FORMATTER = 
-            new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
+
+    public static SimpleDateFormat FORMATTER
+            = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
     public static String ID = "id";
     public static String URL = "url";
     public static String TITLE = "title";
     public static String DATE = "date";
     public static String LOCAL_PATH = "localPath";
     public static String BOARD_ID = "boardId";
-    
-    ImageLogic(){
+
+    ImageLogic() {
         super(new ImageDAL());
     }
-    
-    public List<Image> getAll(){
+
+    @Override
+    public List<Image> getAll() {
         return get(() -> dal().findAll());
     }
-    
-    public Image getWithId(int id){
+
+    @Override
+    public Image getWithId(int id) {
         return get(() -> dal().findById(id));
     }
-    
+
     public List<Image> getImagesWithBoardId(int boardID) {
         return get(() -> dal().findByBoardId(boardID));
     }
-    
-    public List<Image> getImagesWithTitle(String title){
+
+    public List<Image> getImagesWithTitle(String title) {
         return get(() -> dal().findByTitle(title));
     }
-    
-    public Image getImageWithUrl(String url){
+
+    public Image getImageWithUrl(String url) {
         return get(() -> dal().findByUrl(url));
     }
-    
-    public Image getImageWithLocalPath(String path){
+
+    public Image getImageWithLocalPath(String path) {
         return get(() -> dal().findByLocalPath(path));
     }
-    
-    public List<Image> getImagesWithDate(Date date){
+
+    public List<Image> getImagesWithDate(Date date) {
         return get(() -> dal().findByDate(date));
     }
-    
-    public String convertDate(Date date){
+
+    //converts the date from date type to string.
+    public String convertDate(Date date) {
         String dateString = FORMATTER.format(date);
-        return dateString; 
+        return dateString;
     }
-    
-    public Image createEntity(Map<String, String[]> parameterMap){
+
+    @Override
+    public Image createEntity(Map<String, String[]> parameterMap) {
         Objects.requireNonNull(parameterMap, "parameterMap cannot be null");
         //same as if condition below
         //        if (parameterMap == null) {
@@ -92,6 +95,9 @@ public class ImageLogic extends GenericLogic<Image, ImageDAL> {
             }
         }
 
+        //Board ID is generated, so if it exists add it to the entity object
+        //otherwise it does not matter as mysql will create an if for it.
+        //the only time that we will have board id is for update behaviour.
         if (parameterMap.containsKey(BOARD_ID)) {
             try {
                 Board board = new Board(Integer.parseInt(parameterMap.get(BOARD_ID)[0]));
@@ -100,30 +106,26 @@ public class ImageLogic extends GenericLogic<Image, ImageDAL> {
                 throw new ValidationException(ex);
             }
         }
-        
+
+        //Date is generated, so if it exists add t to the entity object.
         if (parameterMap.containsKey(DATE)) {
             try {
                 String dateString = parameterMap.get(DATE)[0];
+                //convert the date string to a date type and set date to entity. 
                 entity.setDate(FORMATTER.parse(dateString));
             } catch (ParseException ex) {
                 throw new ValidationException(ex);
             }
         }
 
-        //before using the values in the map, make sure to do error checking.
-        //simple lambda to validate a string, this can also be place in another
-        //method to be shared amoung all logic classes.
+        //Method does error checking for us.
+        //Simple lambda to validate that the string has the appropriate value and length.
         ObjIntConsumer< String> validator = (value, length) -> {
             if (value == null || value.trim().isEmpty() || value.length() > length) {
                 throw new ValidationException("value cannot be null, empty or larger than " + length + " characters");
             }
         };
 
-        //extract the date from map first.
-        //everything in the parameterMap is string so it must first be
-        //converted to appropriate type. have in mind that values are
-        //stored in an array of String; almost always the value is at
-        //index zero unless you have used duplicated key/name somewhere.
         String title = parameterMap.get(TITLE)[0];
         String url = parameterMap.get(URL)[0];
         String localPath = parameterMap.get(LOCAL_PATH)[0];
@@ -132,7 +134,7 @@ public class ImageLogic extends GenericLogic<Image, ImageDAL> {
         validator.accept(title, 255);
         validator.accept(url, 100);
         validator.accept(localPath, 100);
-        
+
         //set values on entity
         entity.setTitle(title);
         entity.setUrl(url);
@@ -141,21 +143,43 @@ public class ImageLogic extends GenericLogic<Image, ImageDAL> {
         return entity;
     }
     
-    public Image updateEntity(Map<String, String[]> parameterMap){
+    //If used, it would have allowed us to update entity values that we have already set.
+    public Image updateEntity(Map<String, String[]> parameterMap) {
         return null;
     }
- 
     
-    public List<String> getColumnNames(){
+    /**
+     * this method is used to send a list of all names to be used form table
+     * column headers.
+     *
+     * @return list of all column names to be displayed.
+     */
+    @Override
+    public List<String> getColumnNames() {
         return Arrays.asList("ID", "BoardID", "Title", "Url", "LocalPath", "Date");
     }
     
-    public List<String> getColumnCodes(){
+    /**
+     * this method returns a list of column names that match the official column
+     * names in the db. 
+     *
+     * @return list of all column names in DB.
+     */
+    @Override
+    public List<String> getColumnCodes() {
         return Arrays.asList(ID, BOARD_ID, TITLE, URL, LOCAL_PATH, DATE);
     }
-    
-    public List<?> extractDataAsList(Image e){
+
+    /**
+     * return the list of values of all columns (variables) in given entity.
+     *
+     * @param e - given Entity to extract data from.
+     *
+     * @return list of extracted values
+     */
+    @Override
+    public List<?> extractDataAsList(Image e) {
         return Arrays.asList(e.getId(), e.getBoard(), e.getTitle(), e.getUrl(), e.getLocalPath(), e.getDate());
     }
-    
+
 }

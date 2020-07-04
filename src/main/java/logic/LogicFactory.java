@@ -7,16 +7,23 @@ import java.lang.reflect.InvocationTargetException;
  * @author Shariar (Shawn) Emami
  */
 public abstract class LogicFactory<T> {
-        
+
     private static String PACKAGE = "logic";
     private static String SUFFIX = "Logic";
-    
-    private LogicFactory(){
-        
+
+    //empty constructor
+    private LogicFactory() {
+
     }
-  
-    public static <T> T getFor(String entityName){
-        
+
+    /**
+     * Allows you to get the logics needed to create and add entities.
+     *
+     * @param entityName specific entity name
+     * @return the next function with class name
+     */
+    public static <T> T getFor(String entityName) {
+
         try {
             Class<?> genericClass = Class.forName(PACKAGE + "." + entityName + SUFFIX);
             return getFor((Class<T>) genericClass);
@@ -25,32 +32,20 @@ public abstract class LogicFactory<T> {
         }
         return null;
     }
-    
-   
-    public static <T> T getFor(Class<T> type){
-        try{
-           return type.getDeclaredConstructor().newInstance();    
-        } catch(InstantiationException e){
-            e.printStackTrace();
-        } catch(IllegalAccessException e){
-            e.printStackTrace();
-        } catch(IllegalArgumentException e){
-            e.printStackTrace();
-        } catch(InvocationTargetException e){
-            e.printStackTrace();
-        } catch(NoSuchMethodException e){
-            e.printStackTrace();
-        } catch(SecurityException e){
+
+    /**
+     * Returns a new instance of the declared constructor.
+     *
+     * @param <T>
+     * @param type
+     * @return a new instance or null
+     */
+    public static <T> T getFor(Class<T> type) {
+        try {
+            return type.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
         }
-       return null;
+        return null;
     }
-     
- 
-
-    //this is just a place holder to keep the code working.
-/*    public static AccountLogic getFor(String account) {
-        return new AccountLogic();
-    }
-*/  
 }

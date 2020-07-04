@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Board.findAll", query = "SELECT b FROM Board b join fetch b.hostid"),
     @NamedQuery(name = "Board.findById", query = "SELECT b FROM Board b join fetch b.hostid WHERE b.id = :id"),
     @NamedQuery(name = "Board.findByUrl", query = "SELECT b FROM Board b join fetch b.hostid WHERE b.url = :url"),
-    @NamedQuery(name = "Board.findByHostId", query = "SELECT b FROM Board b join fetch b.hostid WHERE b.hostid = :hostid"),
+    @NamedQuery(name = "Board.findByHostId", query = "SELECT b FROM Board b join fetch b.hostid WHERE b.hostid.id = :hostid"),
     @NamedQuery(name = "Board.findByName", query = "SELECT b FROM Board b join fetch b.hostid WHERE b.name = :name")})
 public class Board implements Serializable {
 

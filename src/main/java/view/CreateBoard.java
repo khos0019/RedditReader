@@ -22,15 +22,16 @@ import logic.LogicFactory;
 
 /**
  *
- * @author Khosla
+ * @author Navraj Khosla
  */
 @WebServlet(name = "CreateBoard", urlPatterns = {"/CreateBoard"})
 public class CreateBoard extends HttpServlet {
-    
+
     private String errorMessage = null;
-    
+
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -41,7 +42,7 @@ public class CreateBoard extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -52,21 +53,18 @@ public class CreateBoard extends HttpServlet {
             out.println("<div style=\"display: inline-block; text-align: left;\">");
             out.println("<form method=\"post\">");
             out.println("Host ID:<br>");
-            //instead of typing the name of column manualy use the static vraiable in logic
-            //use the same name as column id of the table. will use this name to get date
-            //from parameter map.
-            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>",BoardLogic.HOST_ID);
+            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>", BoardLogic.HOST_ID);
             out.println("<br>");
             out.println("Url:<br>");
-            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>",BoardLogic.URL);
+            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>", BoardLogic.URL);
             out.println("<br>");
             out.println("Name:<br>");
-            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>",BoardLogic.NAME);
+            out.printf("<input type=\"text\" name=\"%s\" value=\"\"><br>", BoardLogic.NAME);
             out.println("<br>");
             out.println("<input type=\"submit\" name=\"view\" value=\"Add and View\">");
             out.println("<input type=\"submit\" name=\"add\" value=\"Add\">");
             out.println("</form>");
-            if(errorMessage!=null&&!errorMessage.isEmpty()){
+            if (errorMessage != null && !errorMessage.isEmpty()) {
                 out.println("<p color=red>");
                 out.println("<font color=red size=4px>");
                 out.println(errorMessage);
@@ -92,13 +90,13 @@ public class CreateBoard extends HttpServlet {
                 .append(System.lineSeparator()));
         return builder.toString();
     }
-    
-     /**
+
+    /**
      * Handles the HTTP <code>GET</code> method.
-     * 
-     * get method is called first when requesting a URL. since this servlet
-     * will create a host this method simple delivers the html code. 
-     * creation will be done in doPost method.
+     *
+     * get method is called first when requesting a URL. since this servlet will
+     * create a host this method simple delivers the html code. creation will be
+     * done in doPost method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -111,10 +109,10 @@ public class CreateBoard extends HttpServlet {
         log("GET");
         processRequest(request, response);
     }
-    
-     /**
+
+    /**
      * Handles the HTTP <code>POST</code> method.
-     * 
+     *
      * this method will handle the creation of entity. as it is called by user
      * submitting data through browser.
      *
@@ -127,28 +125,29 @@ public class CreateBoard extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         log("POST");
-        
+
         BoardLogic bLogic = LogicFactory.getFor("Board");
         String url = request.getParameter(BoardLogic.URL);
-        if(bLogic.getBoardWithUrl(url)==null){
+
+        if (bLogic.getBoardWithUrl(url) == null) {
             HostLogic hLogic = LogicFactory.getFor("Host");
-            Board board = bLogic.createEntity( request.getParameterMap());           
+            Board board = bLogic.createEntity(request.getParameterMap());
             Host host = hLogic.getWithId(Integer.parseInt(request.getParameter(BoardLogic.HOST_ID)));
-            board.setHostid(host);           
+            board.setHostid(host);
             bLogic.add(board);
-        }else{
+        } else {
             //if duplicate print the error message
             errorMessage = "Url: \"" + url + "\" already exists";
         }
-        if( request.getParameter("add")!=null){
+        if (request.getParameter("add") != null) {
             //if add button is pressed return the same page
             processRequest(request, response);
-        }else if (request.getParameter("view")!=null) {
+        } else if (request.getParameter("view") != null) {
             //if view button is pressed redirect to the appropriate table
             response.sendRedirect("BoardTable");
         }
     }
-    
+
     /**
      * Returns a short description of the servlet.
      *
@@ -161,16 +160,16 @@ public class CreateBoard extends HttpServlet {
 
     private static final boolean DEBUG = true;
 
-    public void log( String msg) {
-        if(DEBUG){
-            String message = String.format( "[%s] %s", getClass().getSimpleName(), msg);
-            getServletContext().log( message);
+    public void log(String msg) {
+        if (DEBUG) {
+            String message = String.format("[%s] %s", getClass().getSimpleName(), msg);
+            getServletContext().log(message);
         }
     }
 
-    public void log( String msg, Throwable t) {
-        String message = String.format( "[%s] %s", getClass().getSimpleName(), msg);
-        getServletContext().log( message, t);
+    public void log(String msg, Throwable t) {
+        String message = String.format("[%s] %s", getClass().getSimpleName(), msg);
+        getServletContext().log(message, t);
     }
-    
+
 }

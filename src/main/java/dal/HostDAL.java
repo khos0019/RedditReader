@@ -7,10 +7,10 @@ package dal;
 import entity.Host;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map; 
 /**
  *
- * @author AmarJ
+ * @author Amarjeet Singh
  */
 public class HostDAL extends GenericDAL<Host>{
     public HostDAL() {
@@ -39,18 +39,30 @@ public class HostDAL extends GenericDAL<Host>{
     public Host findByName( String name){
         Map<String, Object> map = new HashMap<>();
         map.put("nick", name);
+        //first argument is a name given to a named query defined in appropriate entity
+        //second argument is map used for parameter substitution.
+        //parameters are names starting with : in named queries, :[name]
+        //in this case the parameter is named "name" and value for it is put in map
         return findResult( "Host.findByName", map);
     }
     
     public Host findByUrl( String url){
         Map<String, Object> map = new HashMap<>();
         map.put("url", url);
+        //first argument is a name given to a named query defined in appropriate entity
+        //second argument is map used for parameter substitution.
+        //parameters are names starting with : in named queries, :[name]
+        //in this case the parameter is named "url" and value for it is put in map
         return findResult( "Host.findByUrl", map);
     }
     
     public List<Host> findByExtractionType(String type){
         Map<String, Object> map = new HashMap<>();
         map.put("type", type);
+        //first argument is a name given to a named query defined in appropriate entity
+        //second argument is map used for parameter substitution.
+        //parameters are names starting with : in named queries, :[name]
+        //in this case the parameter is named "type" and value for it is put in map
         return findResults( "Host.findAll", map);
     }
 }
