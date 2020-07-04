@@ -31,7 +31,7 @@ import javax.validation.constraints.Size;
     @NamedQuery(name = "Image.findByTitle", query = "SELECT i FROM Image i join fetch i.board WHERE i.title = :title"),
     @NamedQuery(name = "Image.findByUrl", query = "SELECT i FROM Image i join fetch i.board WHERE i.url = :url"),
     @NamedQuery(name = "Image.findByLocalPath", query = "SELECT i FROM Image i join fetch i.board WHERE i.localPath = :localPath"),
-    @NamedQuery(name = "Image.findByBoardId", query = "SELECT i FROM Image i join fetch i.board WHERE i.board = :boardid"),
+    @NamedQuery(name = "Image.findByBoardId", query = "SELECT i FROM Image i join fetch i.board WHERE i.board.id = :boardid"),
     @NamedQuery(name = "Image.findByDate", query = "SELECT i FROM Image i join fetch i.board WHERE i.date = :date")})
 //by using fetch we grab the needed dependency when getting a new object.
 public class Image implements Serializable {

@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 public class ImageLogic extends GenericLogic<Image, ImageDAL> {
     
     public static SimpleDateFormat FORMATTER = 
-            new SimpleDateFormat("YYYY,MM,DD hh:mm:ss");
+            new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
     public static String ID = "id";
     public static String URL = "url";
     public static String TITLE = "title";
@@ -147,15 +147,15 @@ public class ImageLogic extends GenericLogic<Image, ImageDAL> {
  
     
     public List<String> getColumnNames(){
-        return Arrays.asList("ID", "Title", "Url", "LocalPath", "Date", "BoardID");
+        return Arrays.asList("ID", "BoardID", "Title", "Url", "LocalPath", "Date");
     }
     
     public List<String> getColumnCodes(){
-        return Arrays.asList(ID, TITLE, URL, LOCAL_PATH, DATE, BOARD_ID);
+        return Arrays.asList(ID, BOARD_ID, TITLE, URL, LOCAL_PATH, DATE);
     }
     
     public List<?> extractDataAsList(Image e){
-        return Arrays.asList(e.getId(), e.getTitle(), e.getUrl(), e.getLocalPath(), e.getDate(), e.getBoard());
+        return Arrays.asList(e.getId(), e.getBoard(), e.getTitle(), e.getUrl(), e.getLocalPath(), e.getDate());
     }
     
 }

@@ -61,12 +61,12 @@ public class BoardTableView extends HttpServlet {
             }
             out.println("</tr>");
 
-            for (Board e : entities) {
+            entities.forEach((entity) -> {
                 //for other tables replace the code bellow with
                 //extractDataAsList in a loop to fill the data.
                 out.printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
-                        logic.extractDataAsList(e).toArray());
-            }
+                        logic.extractDataAsList(entity).toArray());
+            });
 
             out.println("<tr>");
             //this is an example, for your other tables use getColumnNames from
