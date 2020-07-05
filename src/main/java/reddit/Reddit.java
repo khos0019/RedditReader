@@ -25,9 +25,9 @@ public class Reddit {
      * you need to initialize the next three variables based on the given
      * instructions in prelab
      */
-    private static final String CLIENT_ID = "GKzhWubf2QM15Q";
-    private static final String CLIENT_SECRET = "A5Cqkn0Wy7mHzJCY7Ntl53R-SZk";
-    private static final String REDDIT_USER = "khos0019";
+    private static final String CLIENT_ID = "_bfVYHP8yB0Ovw";
+    private static final String CLIENT_SECRET = "sb-MO9jaV3woTZNJPZHoZLVh-cM";
+    private static final String REDDIT_USER = "JavaPrelabTestAcc";
 
     /**
      * replace yourname with your name in the text below, no spaces and

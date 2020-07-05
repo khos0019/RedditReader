@@ -10,9 +10,14 @@ import entity.Board;
 import entity.Image;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +38,7 @@ import reddit.Sort;
 public class ImageView extends HttpServlet {
 
     private String errorMessage = null;
-
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -45,18 +50,31 @@ public class ImageView extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
 
             out.println("<!DOCTYPE html>");
             out.println("<html>");
+            out.println("<head>");
+            out.println("<link rel=\"stylesheet\" type=\"text/css\" href=\"style/ImageView.css\">");
+            out.println("<title>ImageView</title>");
+            out.println("</head>");
             out.println("<body>");
-            out.println("<div align=\"center\">");
-            out.println("<div align=\"center\" class=\"imageContainer\">");
-            out.println("<img class=\"imageThumb\" src=\"image/[image_name]\"/>");
-            out.println("</div>");
-            out.println("</div>");
 
+            ImageLogic imageLogic = LogicFactory.getFor("Image");
+            List<Image> imageList = imageLogic.getAll();
+            for (Image image : imageList) {
+
+                URL urlObj = new URL(image.getUrl());
+                String fileName = urlObj.getFile();
+                out.println("<div align=\"center\">");
+                out.println("<div align=\"center\" class=\"imageContainer\">");
+                out.println("<img class=\"imageThumb\" src=\"image/" + fileName + "\"/>");
+                out.println("</div>");
+                out.println("</div>");
+
+            }
             out.println("</body>");
             out.println("</html>");
         }
@@ -76,32 +94,47 @@ public class ImageView extends HttpServlet {
 
         String path = System.getProperty("user.home") + "/My Documents/Reddit Images/";
         FileUtility.createDirectory(path);
-        ImageLogic imageLogic = LogicFactory.getFor("image");
-
-        BoardLogic boardLogic = LogicFactory.getFor("board");
-        Board bEntity = boardLogic.getBoardsWithName("EarthPorn").get(0);
+        ImageLogic imageLogic = LogicFactory.getFor("Image");
+        BoardLogic boardLogic = LogicFactory.getFor("Board");
+        Board bEntity = boardLogic.getAll().get(0);
 
         Reddit obj = new Reddit();
-        obj.authenticate().buildRedditPagesConfig(bEntity.getName(), 5, Sort.TOP);
+        obj.authenticate().buildRedditPagesConfig(bEntity.getName(), 20, Sort.BEST);
         //create a lambda that accepts post
         Consumer<Post> saveImage = (Post post) -> {
             //if post is an image and SFW
-            if (post.isImage() && post.isOver18() && imageLogic.getImageWithUrl(post.getUrl()) == null) {
+            if (post.isImage() && !post.isOver18()) {
                 //get the path for the image which is unique
                 String url = post.getUrl();
-                //save it in img directory
-                FileUtility.downloadAndSaveFile(url, path);
+                URL urlObj;
+                String name = null;
+                try {
+                    urlObj = new URL(url);
+
+                    //if name is null use the name in url
+                    if (name == null || name.isEmpty()) {
+                        name = urlObj.getFile();
+                    }
+                    if (name.contains("?")) {
+                        name = name.substring(0, name.indexOf("?"));
+                    }
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(ImageView.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 Map<String, String[]> imageMap = new HashMap<>();
                 imageMap.put(ImageLogic.TITLE, new String[]{post.getTitle()});
-                imageMap.put(ImageLogic.LOCAL_PATH, new String[]{path});
+                imageMap.put(ImageLogic.LOCAL_PATH, new String[]{System.getProperty("user.home") + "/My Documents/Reddit Images" + name});
                 imageMap.put(ImageLogic.URL, new String[]{url});
-                imageMap.put(ImageLogic.DATE, new String[]{post.getDate().toString()});
-                imageMap.put(ImageLogic.BOARD_ID, new String[]{bEntity.getId().toString()});
-                Image image = imageLogic.createEntity(imageMap);
+                imageMap.put(ImageLogic.DATE, new String[]{imageLogic.convertDate(post.getDate())});
 
-                //Add image to DB if doesn't exist
-                imageLogic.add(image);
+                Image image = imageLogic.createEntity(imageMap);
+                image.setBoard(bEntity);
+                if (imageLogic.getImageWithLocalPath(image.getLocalPath()) == null) {
+                    FileUtility.downloadAndSaveFile(url, path);
+                    //Add image to DB
+                    imageLogic.add(image);
+                }
 
             }
 
@@ -137,7 +170,7 @@ public class ImageView extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return " Image View ";
+        return "Image View";
     }
 
     private static final boolean DEBUG = true;

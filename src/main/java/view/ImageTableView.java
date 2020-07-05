@@ -56,22 +56,29 @@ public class ImageTableView extends HttpServlet {
 
             //logic to create headers
             for (Object obj : logic.getColumnNames().toArray()) {
-                out.printf("<td>%s</td>", obj);
+                out.printf("<th>%s</th>", obj);
             }
 
             out.println("</tr>");
 
             //logic to fill/extract data
             for (Image e : entities) {
-                out.printf("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>",
-                        logic.extractDataAsList(e).toArray());
+                
+                out.println("<tr>");
+                
+                for(Object obj : logic.extractDataAsList(e).toArray()){
+                    out.printf("<td>%s</td>", obj);
+
+                }
+                
+                out.println("</tr>");
             }
 
             out.println("<tr>");
 
             //logic to create headers
             for (Object obj : logic.getColumnNames().toArray()) {
-                out.printf("<td>%s</td>", obj);
+                out.printf("<th>%s</th>", obj);
             }
 
             out.println("</tr>");
